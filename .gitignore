@@ -1,0 +1,4 @@
+sessions/
+tracking/
+telegram_config.json
+.env
