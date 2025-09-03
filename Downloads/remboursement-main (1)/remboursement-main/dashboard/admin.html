@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة تحكم المسؤول - إدارة طلبات الاسترداد</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+
+    <div id="login-section" class="flex flex-col items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-4 text-center">تسجيل دخول المسؤول</h2>
+            <input id="admin-password" type="password" placeholder="كلمة المرور" class="w-full p-2 border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <button id="login-btn" class="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700 transition">دخول</button>
+            <div id="login-error" class="text-red-600 mt-2 text-center hidden">كلمة المرور غير صحيحة!</div>
+        </div>
+    </div>
+
+    <div id="dashboard-section" class="hidden p-4">
+        <h1 class="text-3xl font-bold mb-6 text-center">لوحة تحكم المسؤول</h1>
+
+        <div class="flex flex-wrap justify-center gap-4 mb-6">
+            <div class="bg-white rounded shadow p-4 min-w-[150px] text-center">
+                <div class="text-gray-600">الطلبات المعلقة</div>
+                <div id="pending-count" class="text-3xl font-bold text-yellow-500">0</div>
+            </div>
+            <div class="bg-white rounded shadow p-4 min-w-[150px] text-center">
+                <div class="text-gray-600">الطلبات الموافق عليها</div>
+                <div id="approved-count" class="text-3xl font-bold text-green-600">0</div>
+            </div>
+            <button id="refresh-btn" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition flex items-center gap-2">
+                <i class="fas fa-sync-alt"></i> تحديث الآن
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white rounded shadow">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="py-2 px-2">#</th>
+                        <th class="py-2 px-2">الاسم</th>
+                        <th class="py-2 px-2">الهاتف</th>
+                        <th class="py-2 px-2">المشغل</th>
+                        <th class="py-2 px-2">البنك</th>
+                        <th class="py-2 px-2">المبلغ</th>
+                        <th class="py-2 px-2">السبب</th>
+                        <th class="py-2 px-2">رقم البطاقة</th>
+                        <th class="py-2 px-2">تاريخ الطلب</th>
+                        <th class="py-2 px-2">الحالة</th>
+                        <th class="py-2 px-2">إجراء</th>
+                    </tr>
+                </thead>
+                <tbody id="requests-table">
+                    <!-- الطلبات ستظهر هنا -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        // كلمة مرور المسؤول (يمكنك تغييرها في الباكند أيضاً)
+        const ADMIN_PASSWORD = "admin123";
+
+        // عناصر الصفحة
+        const loginSection = document.getElementById("login-section");
+        const dashboardSection = document.getElementById("dashboard-section");
+        const loginBtn = document.getElementById("login-btn");
+        const adminPasswordInput = document.getElementById("admin-password");
+        const loginError = document.getElementById("login-error");
+        const requestsTable = document.getElementById("requests-table");
+        const pendingCount = document.getElementById("pending-count");
+        const approvedCount = document.getElementById("approved-count");
+        const refreshBtn = document.getElementById("refresh-btn");
+
+        // وظيفة تحقق كلمة المرور
+        loginBtn.addEventListener("click", () => {
+            if (adminPasswordInput.value === ADMIN_PASSWORD) {
+                loginSection.classList.add("hidden");
+                dashboardSection.classList.remove("hidden");
+                sessionStorage.setItem("adminLoggedIn", "true");
+                fetchRequests();
+                setInterval(fetchRequests, 60000); // تحديث تلقائي كل دقيقة
+            } else {
+                loginError.classList.remove("hidden");
+            }
+        });
+
+        // تحديث الطلبات عند الضغط على زر التحديث
+        refreshBtn.addEventListener("click", fetchRequests);
+
+        // جلب الطلبات من الباكند
+        async function fetchRequests() {
+            requestsTable.innerHTML = '<tr><td colspan="11" class="text-center py-6">جاري التحميل...</td></tr>';
+            try {
+                const res = await fetch("/api/admin/requests");
+                const data = await res.json();
+                renderRequests(data.requests || []);
+            } catch (err) {
+                requestsTable.innerHTML = '<tr><td colspan="11" class="text-center py-6 text-red-600">تعذر تحميل الطلبات.</td></tr>';
+            }
+        }
+
+        // عرض الطلبات في الجدول
+        function renderRequests(requests) {
+            requestsTable.innerHTML = "";
+            let pending = 0;
+            let approved = 0;
+
+            if (requests.length === 0) {
+                requestsTable.innerHTML = '<tr><td colspan="11" class="text-center py-6">لا توجد طلبات حالياً.</td></tr>';
+                pendingCount.textContent = "0";
+                approvedCount.textContent = "0";
+                return;
+            }
+
+            requests.forEach((req, idx) => {
+                let statusColor = req.status === "approved" ? "text-green-600" : "text-yellow-500";
+                let statusText = req.status === "approved" ? "موافق عليه" : "معلق";
+                if (req.status === "approved") approved++; else pending++;
+
+                let approveBtn = req.status === "pending" 
+                    ? `<button class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-700 transition" onclick="approveRequest('${req.token}', this)">موافقة</button>`
+                    : `<span class="text-green-600 font-bold"><i class="fas fa-check-circle"></i></span>`;
+                
+                // استخراج البيانات من details إذا كانت موجودة
+                let details;
+                try { details = JSON.parse(req.details); } catch { details = {}; }
+
+                requestsTable.innerHTML += `
+                    <tr class="border-b">
+                        <td class="py-2 px-2">${idx + 1}</td>
+                        <td class="py-2 px-2">${req.name || "-"}</td>
+                        <td class="py-2 px-2">${req.email || "-"}</td>
+                        <td class="py-2 px-2">${details.operator || "-"}</td>
+                        <td class="py-2 px-2">${details.bank || "-"}</td>
+                        <td class="py-2 px-2">${details.amount || "-"}</td>
+                        <td class="py-2 px-2">${details.reason || "-"}</td>
+                        <td class="py-2 px-2">${details.card ? "**** **** **** " + details.card.slice(-4) : "-"}</td>
+                        <td class="py-2 px-2">${req.timestamp ? new Date(req.timestamp).toLocaleString('fr-FR') : "-"}</td>
+                        <td class="py-2 px-2"><span class="${statusColor} font-bold">${statusText}</span></td>
+                        <td class="py-2 px-2 text-center">${approveBtn}</td>
+                    </tr>
+                `;
+            });
+            pendingCount.textContent = pending;
+            approvedCount.textContent = approved;
+        }
+
+        // وظيفة الموافقة على الطلب
+        async function approveRequest(token, btn) {
+            btn.disabled = true;
+            btn.textContent = "جاري الموافقة...";
+            try {
+                const res = await fetch(`/api/admin/approve/${token}`, { method: "POST" });
+                const data = await res.json();
+                if (data.success) {
+                    btn.outerHTML = `<span class="text-green-600 font-bold"><i class="fas fa-check-circle"></i></span>`;
+                    fetchRequests(); // تحديث الجدول مباشرة
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = "موافقة";
+                    alert("تعذر الموافقة على الطلب!");
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.textContent = "موافقة";
+                alert("خطأ في الاتصال بالخادم!");
+            }
+        }
+
+        // إظهار الطلبات فوراً إذا كان المستخدم أدخل كلمة المرور مسبقاً (اختياري)
+        if (sessionStorage.getItem("adminLoggedIn") === "true") {
+            loginSection.classList.add("hidden");
+            dashboardSection.classList.remove("hidden");
+            fetchRequests();
+            setInterval(fetchRequests, 60000);
+        }
+    </script>
+</body>
+</html>
